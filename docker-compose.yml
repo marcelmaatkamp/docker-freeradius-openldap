@@ -1,0 +1,30 @@
+version: '2'
+services:
+
+ freeradius: 
+  image: "marcelmaatkamp/freeradius"
+  ports:
+   - "1812:1812/udp"
+   - "1813:1813"
+   - "18120:18120"
+  volumes:
+   - "./conf/clients.conf:/etc/raddb/clients.conf"
+   - "./conf/users:/etc/raddb/users"  
+
+ ldap:
+  image: danielguerra/alpine-openldap
+  environment:
+   - SLAPD_PASSWORD=mysecretpassword
+   - SLAPD_DOMAIN=ldap.example.org
+
+ webldap:
+  image: osixia/phpldapadmin
+  environment:
+   - PHPLDAPADMIN_LDAP_HOSTS=ldap
+  links:
+    - ldap:ldap
+  ports:
+    - "443:443"
+
+volumes:
+ ldap:
